@@ -1,0 +1,62 @@
+# ─── Python ───────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.Python
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Environment variables — NEVER commit these
+.env
+.env.local
+.env.*.local
+
+# ─── Node / React ─────────────────────────────────
+node_modules/
+dist/
+build/
+.pnp
+.pnp.js
+
+# Vite
+*.local
+
+# ─── IDE & Editors ────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ─── Logs ─────────────────────────────────────────
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ─── Testing ──────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+coverage/
+
+# ─── Supabase ─────────────────────────────────────
+supabase/.branches
+supabase/.temp
+
+# ─── Misc ─────────────────────────────────────────
+*.pem
+*.key
+.cache/

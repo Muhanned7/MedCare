@@ -1,0 +1,7 @@
+fastapi==0.110.0
+uvicorn==0.28.0
+pydantic>=2.10.0
+supabase>=2.15.0        # was 2.3.7 — bumps httpx floor to >=0.26
+httpx>=0.28.1,<0.29     # pin explicitly to satisfy both supabase (<0.29) and google-genai (>=0.28.1)
+google-genai==2.7.0
+python-dotenv==1.0.1
