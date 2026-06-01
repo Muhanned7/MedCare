@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 // ─────────────────────────────────────────────
-// GREEN TIER — AUTO (confidence > 0.85)
-// Auto-captured with 60s undo countdown
+// GREEN TIER — AUTO
 // ─────────────────────────────────────────────
 function AutoCaptureCard({ item, onUndo, onSave }) {
   const [secondsLeft, setSecondsLeft] = useState(60);
@@ -56,8 +55,7 @@ function AutoCaptureCard({ item, onUndo, onSave }) {
 }
 
 // ─────────────────────────────────────────────
-// YELLOW TIER — REVIEW (confidence 0.60-0.85)
-// Doctor confirms, edits, or dismisses
+// YELLOW TIER — REVIEW
 // ─────────────────────────────────────────────
 function ReviewCard({ item, onConfirm, onDismiss }) {
   const [editing, setEditing] = useState(false);
@@ -117,22 +115,13 @@ function ReviewCard({ item, onConfirm, onDismiss }) {
       <p className="text-amber-600 text-xs mt-1">{item.candidate.suggested_level} · {item.candidate.department}</p>
 
       <div className="flex gap-2 mt-3">
-        <button
-          onClick={handleConfirm}
-          className="bg-amber-600 hover:bg-amber-500 text-slate-950 text-xs font-bold px-3 py-1.5 rounded transition cursor-pointer"
-        >
+        <button onClick={handleConfirm} className="bg-amber-600 hover:bg-amber-500 text-slate-950 text-xs font-bold px-3 py-1.5 rounded transition cursor-pointer">
           ✓ Confirm
         </button>
-        <button
-          onClick={() => setEditing(e => !e)}
-          className="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-medium px-3 py-1.5 rounded transition cursor-pointer"
-        >
+        <button onClick={() => setEditing(e => !e)} className="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-medium px-3 py-1.5 rounded transition cursor-pointer">
           ✎ {editing ? "Cancel Edit" : "Edit"}
         </button>
-        <button
-          onClick={handleDismiss}
-          className="bg-red-900 hover:bg-red-800 text-red-200 text-xs font-medium px-3 py-1.5 rounded transition cursor-pointer"
-        >
+        <button onClick={handleDismiss} className="bg-red-900 hover:bg-red-800 text-red-200 text-xs font-medium px-3 py-1.5 rounded transition cursor-pointer">
           ✗ Dismiss
         </button>
       </div>
@@ -143,8 +132,7 @@ function ReviewCard({ item, onConfirm, onDismiss }) {
 }
 
 // ─────────────────────────────────────────────
-// RED TIER — EXPLICIT (confidence < 0.60)
-// Doctor must manually review and type content
+// RED TIER — EXPLICIT
 // ─────────────────────────────────────────────
 function ExplicitInputCard({ item, onConfirm, onDismiss }) {
   const [content, setContent] = useState(item.candidate.content);
@@ -189,31 +177,20 @@ function ExplicitInputCard({ item, onConfirm, onDismiss }) {
       <p className="text-red-200 font-semibold text-sm mt-1">{item.candidate.title}</p>
       <p className="text-red-400 text-xs mb-2">Low confidence — please review and correct before saving.</p>
 
-      {/* Type selector */}
       <div className="flex gap-2 mb-2">
-        <select
-          value={type}
-          onChange={e => setType(e.target.value)}
-          className="bg-slate-900 text-slate-200 border border-red-800 rounded px-2 py-1 text-xs focus:outline-none"
-        >
+        <select value={type} onChange={e => setType(e.target.value)} className="bg-slate-900 text-slate-200 border border-red-800 rounded px-2 py-1 text-xs focus:outline-none">
           <option value="CONSTRAINT">CONSTRAINT</option>
           <option value="DECISION">DECISION</option>
           <option value="ANTI_PATTERN">ANTI_PATTERN</option>
           <option value="FACT">FACT</option>
         </select>
-
-        <select
-          value={level}
-          onChange={e => setLevel(e.target.value)}
-          className="bg-slate-900 text-slate-200 border border-red-800 rounded px-2 py-1 text-xs focus:outline-none"
-        >
+        <select value={level} onChange={e => setLevel(e.target.value)} className="bg-slate-900 text-slate-200 border border-red-800 rounded px-2 py-1 text-xs focus:outline-none">
           <option value="patient">Patient</option>
           <option value="department">Department</option>
           <option value="hospital">Hospital</option>
         </select>
       </div>
 
-      {/* Editable content */}
       <textarea
         className="w-full bg-slate-900 text-slate-100 border border-red-700 rounded p-2 text-sm font-mono focus:outline-none focus:ring-1 focus:ring-red-500"
         rows={3}
@@ -222,16 +199,10 @@ function ExplicitInputCard({ item, onConfirm, onDismiss }) {
       />
 
       <div className="flex gap-2 mt-3">
-        <button
-          onClick={handleConfirm}
-          className="bg-red-700 hover:bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded transition cursor-pointer"
-        >
+        <button onClick={handleConfirm} className="bg-red-700 hover:bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded transition cursor-pointer">
           ✓ Confirm & Save
         </button>
-        <button
-          onClick={handleDismiss}
-          className="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-medium px-3 py-1.5 rounded transition cursor-pointer"
-        >
+        <button onClick={handleDismiss} className="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-medium px-3 py-1.5 rounded transition cursor-pointer">
           ✗ Dismiss
         </button>
       </div>
@@ -242,26 +213,70 @@ function ExplicitInputCard({ item, onConfirm, onDismiss }) {
 }
 
 // ─────────────────────────────────────────────
-// CONFLICT PANEL — shared across all tiers
+// CONFLICT PANEL — with undo merge
 // ─────────────────────────────────────────────
 function ConflictPanel({ item }) {
-  const [mergedIds, setMergedIds] = useState([]);
+  const [mergedIds, setMergedIds] = useState([]);   // node ids that were merged
+  const [keptIds, setKeptIds]     = useState([]);   // node ids where Keep Both was chosen
+  // Store original content before merge so we can undo
+  const [originalContent, setOriginalContent] = useState({});
 
-  const handleMerge = async (existingNodeId, candidateContent) => {
+  const handleMerge = async (conflict) => {
     try {
+      // 1. Save original content for undo
+      setOriginalContent(prev => ({
+        ...prev,
+        [conflict.existing_node_id]: conflict.existing_content
+      }));
+
+      // 2. Do the merge
       const response = await fetch("http://localhost:8000/api/pipeline/node/merge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          existing_node_id: existingNodeId,
-          new_content: candidateContent,
+          existing_node_id: conflict.existing_node_id,
+          new_content: item.candidate.content,
         }),
       });
       if (!response.ok) throw new Error("Merge failed");
-      setMergedIds(ids => [...ids, existingNodeId]);
+      setMergedIds(ids => [...ids, conflict.existing_node_id]);
     } catch (error) {
       alert(`Merge failed: ${error.message}`);
     }
+  };
+
+  const handleUndoMerge = async (conflict) => {
+    try {
+      const original = originalContent[conflict.existing_node_id];
+      if (!original) {
+        alert("Original content not available for undo.");
+        return;
+      }
+
+      // Re-generate embedding for original content
+      const response = await fetch("http://localhost:8000/api/pipeline/node/undo-merge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          node_id: conflict.existing_node_id,
+          original_content: original,
+        }),
+      });
+      if (!response.ok) throw new Error("Undo failed");
+
+      // Remove from merged, back to unresolved
+      setMergedIds(ids => ids.filter(id => id !== conflict.existing_node_id));
+    } catch (error) {
+      alert(`Undo failed: ${error.message}`);
+    }
+  };
+
+  const handleKeepBoth = (nodeId) => {
+    setKeptIds(ids => [...ids, nodeId]);
+  };
+
+  const handleUndoKeepBoth = (nodeId) => {
+    setKeptIds(ids => ids.filter(id => id !== nodeId));
   };
 
   if (!item.conflicts || item.conflicts.length === 0) return null;
@@ -269,35 +284,65 @@ function ConflictPanel({ item }) {
   return (
     <div className="mt-4 p-3 bg-slate-900 border border-amber-700/50 rounded">
       <p className="text-amber-500 text-xs font-bold mb-2">⚠️ VECTOR CONFLICT DETECTED</p>
-      {item.conflicts.map((conflict, idx) => (
-        <div key={idx} className="bg-slate-800 p-2 rounded mb-2 border border-slate-700">
-          <p className="text-slate-400 text-xs mb-1">
-            Similarity: {(conflict.similarity_score * 100).toFixed(1)}% · Action: {conflict.action_suggestion}
-          </p>
-          <p className="text-slate-300 text-xs italic mb-3">
-            Existing: "{conflict.existing_content.slice(0, 120)}..."
-          </p>
+      {item.conflicts.map((conflict, idx) => {
+        const isMerged   = mergedIds.includes(conflict.existing_node_id);
+        const isKeptBoth = keptIds.includes(conflict.existing_node_id);
 
-          {mergedIds.includes(conflict.existing_node_id) ? (
-            <p className="text-green-400 text-xs font-bold">✅ Merged into {conflict.existing_node_id}</p>
-          ) : (
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleMerge(conflict.existing_node_id, item.candidate.content)}
-                className="bg-amber-600 hover:bg-amber-500 text-slate-950 text-xs font-bold px-3 py-1.5 rounded transition cursor-pointer"
-              >
-                Merge with {conflict.existing_node_id}
-              </button>
-              <button
-                onClick={() => setMergedIds(ids => [...ids, conflict.existing_node_id])}
-                className="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-medium px-3 py-1.5 rounded transition cursor-pointer"
-              >
-                Keep Both
-              </button>
-            </div>
-          )}
-        </div>
-      ))}
+        return (
+          <div key={idx} className="bg-slate-800 p-2 rounded mb-2 border border-slate-700">
+            <p className="text-slate-400 text-xs mb-1">
+              Similarity: {(conflict.similarity_score * 100).toFixed(1)}% · Action: {conflict.action_suggestion}
+            </p>
+            <p className="text-slate-300 text-xs italic mb-3">
+              Existing: "{conflict.existing_content.slice(0, 120)}..."
+            </p>
+
+            {/* MERGED state */}
+            {isMerged && (
+              <div className="flex items-center gap-2">
+                <p className="text-green-400 text-xs font-bold">✅ Merged into {conflict.existing_node_id}</p>
+                <button
+                  onClick={() => handleUndoMerge(conflict)}
+                  className="bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs px-2 py-1 rounded transition cursor-pointer"
+                >
+                  ↩ Undo Merge
+                </button>
+              </div>
+            )}
+
+            {/* KEPT BOTH state */}
+            {isKeptBoth && !isMerged && (
+              <div className="flex items-center gap-2">
+                <p className="text-blue-400 text-xs font-bold">📎 Keeping both entries</p>
+                <button
+                  onClick={() => handleUndoKeepBoth(conflict.existing_node_id)}
+                  className="bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs px-2 py-1 rounded transition cursor-pointer"
+                >
+                  ↩ Undo
+                </button>
+              </div>
+            )}
+
+            {/* UNRESOLVED state */}
+            {!isMerged && !isKeptBoth && (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handleMerge(conflict)}
+                  className="bg-amber-600 hover:bg-amber-500 text-slate-950 text-xs font-bold px-3 py-1.5 rounded transition cursor-pointer"
+                >
+                  Merge with {conflict.existing_node_id}
+                </button>
+                <button
+                  onClick={() => handleKeepBoth(conflict.existing_node_id)}
+                  className="bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs font-medium px-3 py-1.5 rounded transition cursor-pointer"
+                >
+                  Keep Both
+                </button>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -306,13 +351,13 @@ function ConflictPanel({ item }) {
 // SUMMARY BAR
 // ─────────────────────────────────────────────
 function SummaryBar({ candidates }) {
-  const auto = candidates.filter(c => c.routing_tier === "AUTO").length;
-  const review = candidates.filter(c => c.routing_tier === "REVIEW").length;
+  const auto     = candidates.filter(c => c.routing_tier === "AUTO").length;
+  const review   = candidates.filter(c => c.routing_tier === "REVIEW").length;
   const explicit = candidates.filter(c => c.routing_tier === "EXPLICIT").length;
   const conflicts = candidates.filter(c => c.conflicts?.length > 0).length;
 
   return (
-    <div className="flex gap-4 bg-slate-800 border border-slate-700 rounded-lg p-3 text-xs">
+    <div className="flex gap-4 bg-slate-800 border border-slate-700 rounded-lg p-3 text-xs flex-wrap">
       <span className="text-green-400">✅ {auto} Auto-captured</span>
       <span className="text-amber-400">👁 {review} For review</span>
       <span className="text-red-400">✋ {explicit} Explicit input</span>
@@ -324,7 +369,7 @@ function SummaryBar({ candidates }) {
 // ─────────────────────────────────────────────
 // MAIN CANDIDATE LIST
 // ─────────────────────────────────────────────
-export default function CandidateList({ candidates, patientId }) {
+export default function CandidateList({ candidates, patientId, onDone }) {
   if (!candidates || candidates.length === 0) return null;
 
   const handleSave = async (item) => {
@@ -373,34 +418,26 @@ export default function CandidateList({ candidates, patientId }) {
 
       {candidates.map((item, index) => {
         if (item.routing_tier === "AUTO") {
-          return (
-            <AutoCaptureCard
-              key={index}
-              item={item}
-              onSave={handleSave}
-              onUndo={handleDismiss}
-            />
-          );
+          return <AutoCaptureCard key={index} item={item} onSave={handleSave} onUndo={handleDismiss} />;
         } else if (item.routing_tier === "REVIEW") {
-          return (
-            <ReviewCard
-              key={index}
-              item={item}
-              onConfirm={handleSave}
-              onDismiss={handleDismiss}
-            />
-          );
+          return <ReviewCard key={index} item={item} onConfirm={handleSave} onDismiss={handleDismiss} />;
         } else {
-          return (
-            <ExplicitInputCard
-              key={index}
-              item={item}
-              onConfirm={handleSave}
-              onDismiss={handleDismiss}
-            />
-          );
+          return <ExplicitInputCard key={index} item={item} onConfirm={handleSave} onDismiss={handleDismiss} />;
         }
       })}
+
+      {/* ── Done Button ── */}
+      <div className="border-t border-slate-700 pt-4 flex justify-between items-center">
+        <p className="text-slate-500 text-xs">
+          Review all candidates above before closing the session.
+        </p>
+        <button
+          onClick={onDone}
+          className="bg-teal-600 hover:bg-teal-500 text-white font-bold px-6 py-2.5 rounded-lg text-sm transition shadow-md cursor-pointer"
+        >
+          ✅ Done — Close Session
+        </button>
+      </div>
     </div>
   );
 }

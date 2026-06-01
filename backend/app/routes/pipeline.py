@@ -4,6 +4,7 @@ from app.services.extractor import LLMExtractor
 from app.services.router import ConfidenceRouter
 from app.services.vector import VectorService
 from app.database import get_supabase_client
+from pydantic import BaseModel
 from typing import List
 import os
 
@@ -178,6 +179,36 @@ async def dismiss_candidate(payload: DismissPayload):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to log dismissal: {str(e)}")
+
+class UndoMergePayload(BaseModel):
+    node_id: str
+    original_content: str
+
+@router.post("/node/undo-merge")
+async def undo_merge(payload: UndoMergePayload):
+    try:
+        supabase = get_supabase_client()
+
+        # Recompute embedding for original content
+        original_embedding = VectorService.get_embedding(payload.original_content)
+
+        supabase.table("knowledge_nodes").update({
+            "content": payload.original_content,
+            "embedding": original_embedding,
+            "source": "CAPTURE"
+        }).eq("id", payload.node_id).execute()
+
+        supabase.table("event_log").insert({
+            "entity_type": "knowledge_node",
+            "entity_id": payload.node_id,
+            "action": "CAPTURE_MERGE_UNDONE",
+            "payload": {"restored_content": payload.original_content}
+        }).execute()
+
+        return {"status": "undone", "node_id": payload.node_id}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Undo failed: {str(e)}")
 
 
 # ─────────────────────────────────────────────

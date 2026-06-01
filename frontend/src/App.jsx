@@ -13,6 +13,10 @@ export default function App() {
     "PAT-AADHYA": "Aadhya (3F, penicillin allergy)",
   }[patientId] || "No patient selected";
 
+  const handleDone = () => {
+    setCandidates([]);
+  };
+
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 p-8">
       <header className="max-w-5xl mx-auto mb-8 border-b border-slate-800 pb-4">
@@ -40,7 +44,7 @@ export default function App() {
         {candidates && candidates.length > 0 && (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-slate-200">Extracted Knowledge Candidates</h2>
-            <CandidateList candidates={candidates} patientId={patientId} />
+            <CandidateList candidates={candidates} patientId={patientId} onDone={handleDone} />
           </div>
         )}
       </main>
