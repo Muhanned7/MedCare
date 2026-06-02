@@ -18,15 +18,7 @@ async def process_reviewed_transcript(payload: TranscriptReview):
     try:
         supabase = get_supabase_client()
 
-        # 1. Fetch existing patient context so LLM doesn't re-extract known nodes
-        existing_nodes = supabase.table("knowledge_nodes")\
-            .select("id, title, content, type")\
-            .execute()
-
-        context = [
-            {"id": n["id"], "title": n["title"], "content": n["content"], "type": n["type"]}
-            for n in existing_nodes.data
-        ]
+        
 
         # With this — only pass patient-relevant nodes as context:
         existing_nodes = supabase.table("knowledge_nodes")\
@@ -40,7 +32,7 @@ async def process_reviewed_transcript(payload: TranscriptReview):
         ]
 
         # 2. Run LLM extraction with context
-        candidates = await LLMExtractor.extract(payload.reviewed_text, existing_context=[])
+        candidates = await LLMExtractor.extract(payload.reviewed_text)
 
         # 3. Route each candidate + check for vector conflicts
         processed_pipeline = []

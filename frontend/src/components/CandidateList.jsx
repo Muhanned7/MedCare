@@ -3,12 +3,34 @@ import React, { useState, useEffect } from 'react';
 // ─────────────────────────────────────────────
 // GREEN TIER — AUTO
 // ─────────────────────────────────────────────
+
+function timeAgo(isoString) {
+  const now = new Date();
+  const created = new Date(isoString);
+  const diffMs = now - created;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return "just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 30) return `${diffDays}d ago`;
+  const diffMonths = Math.floor(diffDays / 30);
+  if (diffMonths < 12) return `${diffMonths} months ago`;
+  const diffYears = Math.floor(diffDays / 365);
+  return `${diffYears} year${diffYears > 1 ? 's' : ''} ago`;
+}
+
 function AutoCaptureCard({ item, onUndo, onSave }) {
   const [secondsLeft, setSecondsLeft] = useState(60);
   const [saved, setSaved] = useState(false);
+  // Check if there are unresolved conflicts
+  const hasConflicts = item.conflicts && item.conflicts.length > 0;
 
   useEffect(() => {
     if (saved) return;
+    //if (hasConflicts) return;
     if (secondsLeft <= 0) {
       onSave(item);
       setSaved(true);
@@ -220,7 +242,7 @@ function ConflictPanel({ item }) {
   const [keptIds, setKeptIds]     = useState([]);   // node ids where Keep Both was chosen
   // Store original content before merge so we can undo
   const [originalContent, setOriginalContent] = useState({});
-
+  //console.log("Conflict data:", item.conflicts);
   const handleMerge = async (conflict) => {
     try {
       // 1. Save original content for undo
@@ -296,7 +318,12 @@ function ConflictPanel({ item }) {
             <p className="text-slate-300 text-xs italic mb-3">
               Existing: "{conflict.existing_content.slice(0, 120)}..."
             </p>
-
+            {/* ADD THIS LINE */}
+            {conflict.created_at && (
+              <p className="text-slate-500 text-xs mb-3">
+                🕐 Node created: {timeAgo(conflict.created_at)} · {new Date(conflict.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+              </p>
+            )}
             {/* MERGED state */}
             {isMerged && (
               <div className="flex items-center gap-2">

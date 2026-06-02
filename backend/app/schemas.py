@@ -1,6 +1,9 @@
 from pydantic import BaseModel, Field
 from typing import Literal, List, Optional
 
+from typing import Optional
+from datetime import datetime
+
 class TranscriptPayload(BaseModel):
     patient_id: str
     raw_text: str
@@ -19,11 +22,13 @@ class CaptureCandidate(BaseModel):
     department: Optional[str] = None
     rationale: Optional[str] = None
 
+
 class ConflictMatch(BaseModel):
     existing_node_id: str
     similarity_score: float
     existing_content: str
     action_suggestion: Literal["DUPLICATE", "UPDATE", "COEXIST", "NEW", "SUPERSEDE"]
+    created_at: Optional[datetime] = None
 
 class PipelineResponse(BaseModel):
     candidate: CaptureCandidate
