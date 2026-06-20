@@ -6,6 +6,9 @@ knowledge, routes it by confidence, detects semantic conflicts via pgvector,
 and stores verified nodes into a hospital knowledge graph.
 
 ---
+<img width="1103" height="529" alt="image" src="https://github.com/user-attachments/assets/84eaa1f6-4c5e-4b64-b021-ed05692ed1b8" />
+
+
 
 ## Tech Stack
 
