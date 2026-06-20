@@ -1,4 +1,4 @@
-# BRAHMO — Voice → Knowledge Extraction → Conflict Detection
+# MedCare — Voice → Knowledge Extraction → Conflict Detection
 
 A clinical knowledge capture pipeline for Supra Multi-Specialty Hospital.
 Doctors speak or paste consultation notes; the system extracts structured
